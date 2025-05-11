@@ -1,0 +1,161 @@
+:root {
+    --grid-size: 400px;
+    --cell-size: 28%;
+    --primary-color: #3498db;
+    --win-color: #2ecc71;
+    --lose-color: #e74c3c;
+    --draw-color: #f39c12;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: #f3f3f3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.app-container {
+    position: relative;
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.game-container {
+    position: relative;
+    width: var(--grid-size);
+    height: var(--grid-size);
+    margin: 0 auto;
+}
+
+.grid-animation {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.7;
+}
+
+.click-zones {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.click-zone {
+    position: absolute;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.symbol-animation {
+    width: 80% !important;
+    height: 80% !important;
+    pointer-events: none;
+}
+
+.result-banner {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 30px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: top 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+}
+
+.result-banner.visible {
+    top: 20px;
+    opacity: 1;
+}
+
+.result-banner[data-result="X"] {
+    color: var(--win-color);
+}
+
+.result-banner[data-result="O"] {
+    color: var(--lose-color);
+}
+
+.result-banner[data-result="draw"] {
+    color: var(--draw-color);
+}
+
+.restart-button {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, background 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: var(--win-color);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.restart-button:hover {
+    transform: scale(1.05);
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scale(1.05);
+    }
+}
+
+.blink {
+    animation: blink 1s ease-in-out infinite;
+}
+
+* {
+    box-sizing: border-box;
+}
