@@ -13,8 +13,8 @@ export default function App() {
     const [winningLine, setWinningLine] = useState<number[]>([]);
     const [isResetting, setIsResetting] = useState(false);
     const [isFading, setIsFading] = useState(false);
-    const [isInputBlocked, setIsInputBlocked] = useState(false); // NEW
-    const [fadingCells, setFadingCells] = useState<boolean[]>(Array(9).fill(false)); // NEW
+    const [isInputBlocked, setIsInputBlocked] = useState(false);
+    const [fadingCells, setFadingCells] = useState<boolean[]>(Array(9).fill(false));
 
     const checkWinner = useCallback((updatedCells: Cell[]) => {
         const lines = [
