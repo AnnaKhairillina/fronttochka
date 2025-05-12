@@ -10,7 +10,7 @@ type GameBoardProps = {
     onCellClick: (index: number) => void;
     winningLine: number[];
     isResetting: boolean;
-    isFading?: boolean;
+    fadingCells?: boolean[]; // NEW
 };
 
 const clickZones = [
@@ -19,7 +19,7 @@ const clickZones = [
     { x: '20%', y: '80%' }, { x: '50%', y: '80%' }, { x: '80%', y: '80%' },
 ];
 
-export default function GameBoard({ cells, onCellClick, winningLine, isFading }: GameBoardProps) {
+export default function GameBoard({ cells, onCellClick, winningLine, fadingCells }: GameBoardProps) {
     const grid = useMemo(() => (
         <Lottie
             animationData={gridAnimation}
@@ -44,7 +44,7 @@ export default function GameBoard({ cells, onCellClick, winningLine, isFading }:
                                 animationData={cells[index] === 'X' ? crossAnimation : ovalAnimation}
                                 loop={false}
                                 autoPlay={true}
-                                className={`symbol-animation ${winningLine.includes(index) ? 'blink' : ''} ${isFading ? 'fade-out' : ''}`}
+                                className={`symbol-animation ${winningLine.includes(index) ? 'blink' : ''} ${fadingCells?.[index] ? 'fade-out' : ''}`}
                             />
                         )}
                     </div>

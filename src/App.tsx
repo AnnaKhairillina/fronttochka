@@ -12,7 +12,9 @@ export default function App() {
     const [winner, setWinner] = useState<Cell | 'draw'>(null);
     const [winningLine, setWinningLine] = useState<number[]>([]);
     const [isResetting, setIsResetting] = useState(false);
-    const [isFading, setIsFading] = useState(false); // NEW
+    const [isFading, setIsFading] = useState(false);
+    const [isInputBlocked, setIsInputBlocked] = useState(false); // NEW
+    const [fadingCells, setFadingCells] = useState<boolean[]>(Array(9).fill(false)); // NEW
 
     const checkWinner = useCallback((updatedCells: Cell[]) => {
         const lines = [
@@ -33,10 +35,14 @@ export default function App() {
     }, []);
 
     const handleCellClick = (index: number) => {
-        if (cells[index] || isGameOver) return;
+        if (cells[index] || isGameOver || isFading || isInputBlocked) return;
 
         const nextCells = [...cells];
         nextCells[index] = 'X';
+
+        // Block input during the animation
+        setIsInputBlocked(true);
+        setTimeout(() => setIsInputBlocked(false), 600); // Block input for 600ms
 
         const result = checkWinner(nextCells);
         if (result) {
@@ -45,7 +51,7 @@ export default function App() {
         }
 
         setCells(nextCells);
-        setTimeout(() => makeComputerMove(nextCells), 500);
+        setTimeout(() => makeComputerMove(nextCells), 600); // Wait for X animation to finish
     };
 
     const makeComputerMove = (currentCells: Cell[]) => {
@@ -53,66 +59,52 @@ export default function App() {
             .map((cell, i) => (cell === null ? i : null))
             .filter(i => i !== null) as number[];
 
+        let updated: Cell[] = [];
+
+        const tryMove = (i: number) => {
+            updated = [...currentCells];
+            updated[i] = 'O';
+            const result = checkWinner(updated);
+            if (result) {
+                endGame(result, updated);
+            } else {
+                setCells(updated);
+            }
+        };
+
         const randomChance = Math.random();
 
         if (randomChance < 0.5) {
             const i = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-            const updated = [...currentCells];
-            updated[i] = 'O';
-            const result = checkWinner(updated);
-            if (result) return endGame(result, updated);
-            setCells(updated);
-            return;
-        }
-
-        for (let i of emptyIndices) {
-            const temp = [...currentCells];
-            temp[i] = 'O';
-            if (checkWinner(temp) === 'O') {
-                return endGame('O', temp);
+            tryMove(i);
+        } else {
+            for (let i of emptyIndices) {
+                const temp = [...currentCells];
+                temp[i] = 'O';
+                if (checkWinner(temp) === 'O') return tryMove(i);
             }
-        }
 
-        for (let i of emptyIndices) {
-            const temp = [...currentCells];
-            temp[i] = 'X';
-            if (checkWinner(temp) === 'X') {
-                const updated = [...currentCells];
-                updated[i] = 'O';
-                const result = checkWinner(updated);
-                if (result) return endGame(result, updated);
-                setCells(updated);
-                return;
+            for (let i of emptyIndices) {
+                const temp = [...currentCells];
+                temp[i] = 'X';
+                if (checkWinner(temp) === 'X') return tryMove(i);
             }
+
+            if (currentCells[4] === null) return tryMove(4);
+
+            const corners = [0, 2, 6, 8];
+            const freeCorners = corners.filter(i => currentCells[i] === null);
+            if (freeCorners.length > 0) {
+                const i = freeCorners[Math.floor(Math.random() * freeCorners.length)];
+                return tryMove(i);
+            }
+
+            const i = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+            tryMove(i);
         }
 
-        if (currentCells[4] === null) {
-            const updated = [...currentCells];
-            updated[4] = 'O';
-            const result = checkWinner(updated);
-            if (result) return endGame(result, updated);
-            setCells(updated);
-            return;
-        }
-
-        const corners = [0, 2, 6, 8];
-        const freeCorners = corners.filter(i => currentCells[i] === null);
-        if (freeCorners.length > 0) {
-            const i = freeCorners[Math.floor(Math.random() * freeCorners.length)];
-            const updated = [...currentCells];
-            updated[i] = 'O';
-            const result = checkWinner(updated);
-            if (result) return endGame(result, updated);
-            setCells(updated);
-            return;
-        }
-
-        const i = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-        const updated = [...currentCells];
-        updated[i] = 'O';
-        const result = checkWinner(updated);
-        if (result) return endGame(result, updated);
-        setCells(updated);
+        setIsInputBlocked(true);
+        setTimeout(() => setIsInputBlocked(false), 600);
     };
 
     const endGame = (result: Cell | 'draw', updatedCells: Cell[]) => {
@@ -130,14 +122,17 @@ export default function App() {
     };
 
     const resetGame = () => {
-        setIsFading(true);
+        // Set fade-out flags for all non-null cells
+        const fadeFlags = cells.map(cell => cell !== null);
+        setFadingCells(fadeFlags);
+
         setTimeout(() => {
             setCells(Array(9).fill(null));
+            setFadingCells(Array(9).fill(false)); // Reset fade-out state
             setGameOver(false);
             setWinner(null);
             setWinningLine([]);
             setIsResetting(false);
-            setIsFading(false);
         }, 600); // Wait for fade-out animation
     };
 
@@ -160,7 +155,7 @@ export default function App() {
                     onCellClick={handleCellClick}
                     winningLine={winningLine}
                     isResetting={isResetting}
-                    isFading={isFading} // Pass to GameBoard
+                    fadingCells={fadingCells} // Pass fadingCells to GameBoard
                 />
                 <div className="result">
                     <button onClick={resetGame} className="restart-button">
