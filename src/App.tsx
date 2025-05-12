@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import {useState, useCallback} from 'react';
 import Lottie from 'lottie-react';
 import gameAnimation from './assets/game.json';
 import GameBoard from './components/GameBoard';
@@ -40,9 +40,8 @@ export default function App() {
         const nextCells = [...cells];
         nextCells[index] = 'X';
 
-        // Block input during the animation
         setIsInputBlocked(true);
-        setTimeout(() => setIsInputBlocked(false), 600); // Block input for 600ms
+        setTimeout(() => setIsInputBlocked(false), 600);
 
         const result = checkWinner(nextCells);
         if (result) {
@@ -51,7 +50,7 @@ export default function App() {
         }
 
         setCells(nextCells);
-        setTimeout(() => makeComputerMove(nextCells), 600); // Wait for X animation to finish
+        setTimeout(() => makeComputerMove(nextCells), 600);
     };
 
     const makeComputerMove = (currentCells: Cell[]) => {
@@ -74,7 +73,7 @@ export default function App() {
 
         const randomChance = Math.random();
 
-        if (randomChance < 0.5) {
+        if (randomChance < 0.4) {
             const i = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
             tryMove(i);
         } else {
@@ -116,24 +115,23 @@ export default function App() {
             confetti({
                 particleCount: 150,
                 spread: 90,
-                origin: { y: 0.6 }
+                origin: {y: 0.6}
             });
         }
     };
 
     const resetGame = () => {
-        // Set fade-out flags for all non-null cells
         const fadeFlags = cells.map(cell => cell !== null);
         setFadingCells(fadeFlags);
 
         setTimeout(() => {
             setCells(Array(9).fill(null));
-            setFadingCells(Array(9).fill(false)); // Reset fade-out state
+            setFadingCells(Array(9).fill(false));
             setGameOver(false);
             setWinner(null);
             setWinningLine([]);
             setIsResetting(false);
-        }, 600); // Wait for fade-out animation
+        }, 600);
     };
 
     const getResultMessage = () => {
@@ -155,14 +153,14 @@ export default function App() {
                     onCellClick={handleCellClick}
                     winningLine={winningLine}
                     isResetting={isResetting}
-                    fadingCells={fadingCells} // Pass fadingCells to GameBoard
+                    fadingCells={fadingCells}
                 />
                 <div className="result">
                     <button onClick={resetGame} className="restart-button">
                         <Lottie
                             animationData={gameAnimation}
                             loop={true}
-                            style={{ width: 40, height: 40 }}
+                            style={{width: 40, height: 40}}
                         />
                         Играть снова
                     </button>
